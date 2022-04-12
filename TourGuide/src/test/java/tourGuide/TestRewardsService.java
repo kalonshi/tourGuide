@@ -38,7 +38,7 @@ public class TestRewardsService {
 	 * userRewards = user.getUserRewards(); userService.tracker.stopTracking();
 	 * assertTrue(userRewards.size() == 1); }
 	 */
-	
+	//ok 240222*********************************************************
 	@Test
 	public void usersGetRewards() {
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
@@ -64,6 +64,7 @@ public class TestRewardsService {
 		
 		assertTrue(userRewards.size() > 0);
 	}
+	//ok 240222***********************************************************
 	@Test
 	public void isWithinAttractionProximity() {
 		GpsUtilService gpsUtilService = new GpsUtilService();
@@ -72,7 +73,11 @@ public class TestRewardsService {
 		assertTrue(rewardsService.isWithinAttractionProximity(attraction, attraction));
 	}
 	
-	@Ignore // Needs fixed - can throw ConcurrentModificationException
+	/*
+	 * @Ignore // Needs fixed - can throw ConcurrentModificationException
+	 */
+	//ok 120422 trop lent***********************************************************
+	
 	@Test
 	public void nearAllAttractions() {
 		GpsUtilService gpsUtilService = new GpsUtilService();
@@ -84,6 +89,9 @@ public class TestRewardsService {
 		
 		rewardsService.calculateRewards(userService.getAllUsers().get(0));
 		List<UserReward> userRewards = userService.getUserRewards(userService.getAllUsers().get(0));
+		
+		  try { TimeUnit.MILLISECONDS.sleep(1000); } catch (InterruptedException e) { }
+		 
 		userService.tracker.stopTracker();
 
 		assertEquals(gpsUtilService.getAttractions().size(), userRewards.size());

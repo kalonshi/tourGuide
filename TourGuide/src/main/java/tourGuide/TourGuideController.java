@@ -2,6 +2,8 @@ package tourGuide;
 
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,6 +45,8 @@ public class TourGuideController {
     @RequestMapping("/getNearbyAttractions") 
     public String getNearbyAttractions(@RequestParam String userName) {
     	VisitedLocation visitedLocation = userService.getUserLocation(getUser(userName));
+    
+    	
     	return JsonStream.serialize(userService.getNearByAttractions(visitedLocation));
     }
     
@@ -52,7 +56,7 @@ public class TourGuideController {
     }
     
     @RequestMapping("/getAllCurrentLocations")
-    public String getAllCurrentLocations() {
+    public JSONArray getAllCurrentLocations() throws JSONException {
     	// TODO: Get a list of every user's most recent location as JSON
     	//- Note: does not use gpsUtil to query for their current location, 
     	//        but rather gathers the user's current location from their stored location history.
@@ -62,8 +66,8 @@ public class TourGuideController {
     	//        "019b04a9-067a-4c76-8817-ee75088c3822": {"longitude":-48.188821,"latitude":74.84371} 
     	//        ...
     	//     }
-    	
-    	return JsonStream.serialize("");
+    	return userService.getAllCurrentLocations();
+		/* return JsonStream.serialize(""); */
     }
     
     @RequestMapping("/getTripDeals")

@@ -14,6 +14,9 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -43,13 +46,15 @@ public class UserService {
 		this.gpsUtilService = gpsUtilService;
 		this.rewardsService = rewardsService;
 
-		if (testMode) {
+		 if (testMode) { 
 			logger.info("TestMode enabled");
 			logger.debug("Initializing users");
 			initializeInternalUsers();
+			
 			logger.debug("Finished initializing users");
 			
-		}
+
+		 } 
 		tracker = new Tracker(this);
 		initializeTripPricer();
 		addShutDownHook();
@@ -69,14 +74,44 @@ public class UserService {
 	 * user.getLastVisitedLocation() : trackUserLocation(user); return
 	 * visitedLocation; }
 	 */
+	
+	
+	// methode de recupération de la localisation de l'user: Recupération de l'object VisitedLocation
+	
 	public VisitedLocation getUserLocation(User user) {
+		/*
+		 * int size=user.getVisitedLocations().size(); if (size>0) { return
+		 * user.getVisitedLocations().get(size-1); }
+		 */
 		return user.getVisitedLocations().get(0);
 	}
+
+	// Ajout de la localisation dans l'historique de localisation
 	
 	public void finalizeLocation(User user, VisitedLocation visitedLocation) {
 		user.addToVisitedLocations(visitedLocation);
+		System.out.println("liste des localisation="+user.getVisitedLocations().size());
 		rewardsService.calculateRewards(user);
-		tracker.finalizeTrack(user);
+		 tracker.finalizeTrack(user); 
+		
+	}
+
+	// Liste des recentes localisations  des users JSON ARRAY
+	
+	public JSONArray getAllCurrentLocations() throws JSONException {
+
+		List<User> users = getAllUsers();
+		JSONArray allCurrentLocation = new JSONArray();
+		JSONObject object = new JSONObject();
+
+		for (int i = 0; i < users.size(); i++) {
+			int lastIndex = (users.get(i).getVisitedLocations().size()) - 1;
+			object.put("id", users.get(i).getUserId());
+			object.put("longitude", users.get(i).getVisitedLocations().get(lastIndex).location.longitude);
+			object.put("latitude", users.get(i).getVisitedLocations().get(lastIndex).location.latitude);
+			allCurrentLocation.put(object);
+		}
+		return allCurrentLocation;
 	}
 
 	public User getUser(String userName) {
@@ -108,8 +143,18 @@ public class UserService {
 	 * user.addToVisitedLocations(visitedLocation);
 	 * rewardsService.calculateRewards(user); return visitedLocation; }
 	 */
+	
+	// Ajout de la localisation actuelle de l'User
+	
 	public void trackUserLocation(User user) {
+		
 		gpsUtilService.submitLocation(user, this);
+		/*
+		 * GpsUtil gps=new GpsUtil(); gps.getUserLocation(user.getUserId());
+		 * gpsUtilService.getUserLocation(user.getUserId());
+		 * System.out.println(gpsUtilService.getUserLocation(user.getUserId()).location.
+		 * latitude);
+		 */
 	}
 
 	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
@@ -119,14 +164,13 @@ public class UserService {
 				nearbyAttractions.add(attraction);
 			}
 		}
-
 		return nearbyAttractions;
 	}
 
 	private void addShutDownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
-				System.out.println("Shutdown UserService");
+				
 				tracker.stopTracker();
 			}
 		});

@@ -86,6 +86,10 @@ public class User {
 	}
 
 	/*
+	 * public user getLastUserLocation() { List<VisitedLocation> visitedLocations=
+	 * getVisitedLocations(); return user.(visitedLocations.size() - 1); }
+	 */
+	/*
 	 * public void addUserReward(UserReward userReward) {
 	 * if(userRewards.stream().filter(r ->
 	 * !r.attraction.attractionName.equals(userReward.attraction)).count() == 0) {
