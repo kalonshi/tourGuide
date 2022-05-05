@@ -14,14 +14,40 @@ public class UserPreferences {
 	private CurrencyUnit currency = Monetary.getCurrency("USD");
 	private Money lowerPricePoint = Money.of(0, currency);
 	private Money highPricePoint = Money.of(Integer.MAX_VALUE, currency);
-	private int tripDuration = 1;
-	private int ticketQuantity = 1;
-	private int numberOfAdults = 1;
-	private int numberOfChildren = 0;
+	private String userName ;
+	private int tripDuration ;
+	private int ticketQuantity ;
+	private int numberOfAdults ;
+	private int numberOfChildren;
 	
 	public UserPreferences() {
 	}
 	
+	public UserPreferences(int attractionProximity, CurrencyUnit currency, Money lowerPricePoint, Money highPricePoint,
+			String userName, int tripDuration, int ticketQuantity, int numberOfAdults, int numberOfChildren) {
+		super();
+		this.attractionProximity = attractionProximity;
+		this.currency = currency;
+		this.lowerPricePoint = lowerPricePoint;
+		this.highPricePoint = highPricePoint;
+		this.userName = userName;
+		this.tripDuration = tripDuration;
+		this.ticketQuantity = ticketQuantity;
+		this.numberOfAdults = numberOfAdults;
+		this.numberOfChildren = numberOfChildren;
+	}
+
+	public UserPreferences(int attractionProximity, String userName, int tripDuration, int ticketQuantity,
+			int numberOfAdults, int numberOfChildren) {
+		super();
+		this.attractionProximity = attractionProximity;
+		this.userName = userName;
+		this.tripDuration = tripDuration;
+		this.ticketQuantity = ticketQuantity;
+		this.numberOfAdults = numberOfAdults;
+		this.numberOfChildren = numberOfChildren;
+	}
+
 	public void setAttractionProximity(int attractionProximity) {
 		this.attractionProximity = attractionProximity;
 	}

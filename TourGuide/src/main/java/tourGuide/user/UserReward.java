@@ -1,5 +1,7 @@
 package tourGuide.user;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
 
@@ -27,4 +29,23 @@ public class UserReward {
 		return rewardPoints;
 	}
 	
+	/*
+	 * public final VisitedLocation visitedLocation; public final UserAttraction
+	 * userAttraction; private int rewardPoints
+	 * =ThreadLocalRandom.current().nextInt(1, 1000) ; private int rewardPoints ;
+	 * 
+	 * public UserReward(VisitedLocation visitedLocation, UserAttraction
+	 * userAttraction, int rewardPoints) { this.visitedLocation = visitedLocation;
+	 * this.userAttraction = userAttraction; this.rewardPoints = rewardPoints; }
+	 * 
+	 * public UserReward(VisitedLocation visitedLocation, UserAttraction
+	 * userAttraction) { this.visitedLocation = visitedLocation; this.userAttraction
+	 * = userAttraction; }
+	 * 
+	 * 
+	 * public void setRewardPoints(int rewardPoints) { this.rewardPoints =
+	 * rewardPoints; }
+	 * 
+	 * public int getRewardPoints() { return rewardPoints; }
+	 */
 }

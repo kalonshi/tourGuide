@@ -1,23 +1,25 @@
 package tourGuideController;
 
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.jsoniter.output.JsonStream;
 
 import gpsUtil.location.VisitedLocation;
-import tourGuide.service.UserService;
+import tourGuide.service.TourService;
 import tourGuide.user.User;
-
+@RestController
 public class GpsUtilController {
 	
 	@Autowired
-	UserService userService;
+	TourService tourService;
 	
 	 @RequestMapping("/getLocation") 
 	    public String getLocation(@RequestParam String userName) {
-	    	VisitedLocation visitedLocation = userService.getUserLocation(getUser(userName));
+	    	VisitedLocation visitedLocation = tourService.getUserLocation(getUser(userName));
 			return JsonStream.serialize(visitedLocation.location);
 	    }
 	    
@@ -35,13 +37,34 @@ public class GpsUtilController {
 	/*
 	 * @RequestMapping("/getNearbyAttractions") public String
 	 * getNearbyAttractions(@RequestParam String userName) { VisitedLocation
-	 * visitedLocation = userService.getUserLocation(getUser(userName)); return
-	 * JsonStream.serialize(userService.getNearByAttractions(visitedLocation)); }
+	 * visitedLocation = tourService.getUserLocation(getUser(userName)); return
+	 * JsonStream.serialize(tourService.getNearByAttractions(visitedLocation)); }
+	 */
+	/*
+	 * @RequestMapping("/getNearbyAttractions") public String
+	 * getNearbyAttractions(@RequestParam String userName) { VisitedLocation
+	 * visitedLocation = tourService.getUserLocation(getUser(userName));
+	 * 
+	 * 
+	 * return
+	 * JsonStream.serialize(tourService.getNearByAttractions(visitedLocation)); }
 	 */
 	    
+	/*
+	 * @RequestMapping("/getAllCurrentLocations") public String
+	 * getAllCurrentLocations() { // TODO: Get a list of every user's most recent
+	 * location as JSON //- Note: does not use gpsUtil to query for their current
+	 * location, // but rather gathers the user's current location from their stored
+	 * location history. // // Return object should be the just a JSON mapping of
+	 * userId to Locations similar to: // { //
+	 * "019b04a9-067a-4c76-8817-ee75088c3822":
+	 * {"longitude":-48.188821,"latitude":74.84371} // ... // }
+	 * 
+	 * return JsonStream.serialize(""); }
+	 */
 	    
 	    @RequestMapping("/getAllCurrentLocations")
-	    public String getAllCurrentLocations() {
+	    public String getAllCurrentLocations() throws JSONException {
 	    	// TODO: Get a list of every user's most recent location as JSON
 	    	//- Note: does not use gpsUtil to query for their current location, 
 	    	//        but rather gathers the user's current location from their stored location history.
@@ -52,12 +75,10 @@ public class GpsUtilController {
 	    	//        ...
 	    	//     }
 	    	
-	    	return JsonStream.serialize("");
+	    	return JsonStream.serialize(tourService.getAllCurrentLocations());
 	    }
-	    
-	    
 	    private User getUser(String userName) {
-	    	return userService.getUser(userName);
+	    	return tourService.getUser(userName);
 	    }
     
 }

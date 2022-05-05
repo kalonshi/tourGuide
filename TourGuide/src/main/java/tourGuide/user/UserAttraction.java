@@ -1,46 +1,53 @@
 package tourGuide.user;
 
+import java.util.UUID;
+
 public class UserAttraction {
-	public String attractionName; 
-	public double  attractionLongitude;
-	public double  attractionLattitude;
-	public double  userLongitude;
-	public double  userLattitude;
-	public double  dist;
-	public int rewardPoints;
-	
-	
-	
-	public UserAttraction(String attractionName, double attractionLongitude, double attractionLattitude,
-			double userLongitude, double userLattitude, double dist, int rewardPoints) {
+	private UUID attractionId ;
+	private String attractionName; 
+	private String city ;
+    private String state ;
+	 private double  attractionLongitude;
+	 private double  attractionLattitude;
+	 
+	public UserAttraction(String attractionName, String city, String state, double attractionLongitude,
+			double attractionLattitude) {
 		super();
 		this.attractionName = attractionName;
+		this.city = city;
+		this.state = state;
 		this.attractionLongitude = attractionLongitude;
 		this.attractionLattitude = attractionLattitude;
-		this.userLongitude = userLongitude;
-		this.userLattitude = userLattitude;
-		this.dist = dist;
-		this.rewardPoints = rewardPoints;
 	}
-	public UserAttraction(String attractionName, double attractionLongitude, double attractionLattitude,
-			double userLongitude, double userLattitude, int rewardPoints) {
+	
+	public UserAttraction(UUID attractionId, String attractionName, String city, String state,
+			double attractionLongitude, double attractionLattitude) {
 		super();
+		this.attractionId = attractionId;
 		this.attractionName = attractionName;
+		this.city = city;
+		this.state = state;
 		this.attractionLongitude = attractionLongitude;
 		this.attractionLattitude = attractionLattitude;
-		this.userLongitude = userLongitude;
-		this.userLattitude = userLattitude;
-		this.rewardPoints = rewardPoints;
 	}
-	public UserAttraction() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+
 	public String getAttractionName() {
 		return attractionName;
 	}
 	public void setAttractionName(String attractionName) {
 		this.attractionName = attractionName;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public String getState() {
+		return state;
+	}
+	public void setState(String state) {
+		this.state = state;
 	}
 	public double getAttractionLongitude() {
 		return attractionLongitude;
@@ -54,27 +61,14 @@ public class UserAttraction {
 	public void setAttractionLattitude(double attractionLattitude) {
 		this.attractionLattitude = attractionLattitude;
 	}
-	public double getUserLongitude() {
-		return userLongitude;
+	public UUID getAttractionId() {
+		return attractionId;
 	}
-	public void setUserLongitude(double userLongitude) {
-		this.userLongitude = userLongitude;
-	}
-	public double getUserLattitude() {
-		return userLattitude;
-	}
-	public void setUserLattitude(double userLattitude) {
-		this.userLattitude = userLattitude;
-	}
-	public int getRewardPoints() {
-		return rewardPoints;
-	}
-	public void setRewardPoints(int rewardPoints) {
-		this.rewardPoints = rewardPoints;
+	public void setAttractionId(UUID attractionId) {
+		this.attractionId = attractionId;
 	}
 	
-	// Tourist attractions lat/long, 
-     // The user's location lat/long, 
-     // The distance in miles between the user's location and each of the attractions.
-     // The reward points 
+	
+	
+
 }

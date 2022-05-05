@@ -8,6 +8,11 @@ public class UserLocation {
 	private double latitude;
 	private double longitude;
 	private Date TimeLocation;
+	
+	public UserLocation() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 	public UserLocation(UUID userId, double latitude, double longitude, Date timeLocation) {
 		super();
 		this.userId = userId;
@@ -39,6 +44,7 @@ public class UserLocation {
 	public void setTimeLocation(Date timeLocation) {
 		TimeLocation = timeLocation;
 	}
+	
 	
 	
 	
