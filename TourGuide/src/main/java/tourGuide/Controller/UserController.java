@@ -1,4 +1,4 @@
-package tourGuideController;
+package tourGuide.Controller;
 
 import java.util.List;
 
@@ -14,23 +14,28 @@ import gpsUtil.location.VisitedLocation;
 import tourGuide.service.TourService;
 import tourGuide.user.User;
 import tripPricer.Provider;
+
 @RestController
 public class UserController {
 	@Autowired
 	TourService tourService;
 
-	@RequestMapping("/getLocation")
-	public String getLocation(@RequestParam String userName) {
-		VisitedLocation visitedLocation = tourService.getUserLocation(getUser(userName));
-		// tourService.trackUserLocation(getUser(userName));
-		return visitedLocation.location.latitude + ":" + visitedLocation.location.longitude;
+	@RequestMapping("/")
+	public String index() {
+		return "Greetings from TourGuide!";
 	}
-	
-	    
-	private User getUser(String userName) {
-		return tourService.getUser(userName);
-	}
+	/*
+	 * @RequestMapping("/getLocation") public String getLocation(@RequestParam
+	 * String userName) { VisitedLocation visitedLocation =
+	 * tourService.getUserLocation(getUser(userName));
+	 * tourService.trackUserLocation(getUser(userName)); return
+	 * visitedLocation.location.latitude + ":" + visitedLocation.location.longitude;
+	 * }
+	 */
 
-	
+	/*
+	 * private User getUser(String userName) { return tourService.getUser(userName);
+	 * }
+	 */
 
 }

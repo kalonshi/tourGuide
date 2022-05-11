@@ -29,15 +29,19 @@ import tourGuide.user.UserReward;
 public class TestRewardsService {
 	private ExecutorService executor = Executors.newFixedThreadPool(1000);
 
-//test Ok reward = 1 040522
+	/************************************************************************
+	 ********************* VISITEDLOCATION Emule*****************************
+	 ************************************************************************/
+
+	// test Reward = 1 VISITEDLOCATION Emule gpsUtilsUserLocation OK 080522
 	@Test
 	public void usersGetRewards() {
-		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		GpsUtilService gpsUtilService = new GpsUtilService();
 		RewardsService rewardsService = new RewardsService(gpsUtilService, new RewardCentral());
-		InternalTestHelper.setInternalUserNumber(0);
+
 		TourService tourService = new TourService(gpsUtilService, rewardsService);
-		tourService.addUser(user);
+		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+
 		assertTrue(user.getUserRewards().size() == 0);
 
 		Attraction attraction = gpsUtilService.getAttractions().get(0);
@@ -56,36 +60,7 @@ public class TestRewardsService {
 		assertTrue(userRewards.size() == 1);
 	}
 
-	// OK 20/04 test reward>0
-	@Test
-	public void usersGetRewardsTest() {
-		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
-		GpsUtilService gpsUtilService = new GpsUtilService();
-		RewardsService rewardsService = new RewardsService(gpsUtilService, new RewardCentral());
-		InternalTestHelper.setInternalUserNumber(0);
-		TourService tourService = new TourService(gpsUtilService, rewardsService);
-		tourService.addUser(user);
-		assertTrue(user.getUserRewards().size() == 0);
-
-		Attraction attraction = gpsUtilService.getAttractions().get(0);
-		user.clearVisitedLocations();
-		user.addToVisitedLocations(new VisitedLocation(user.getUserId(), attraction, new Date()));
-
-		rewardsService.calculateRewards(user);
-		
-		try {
-			TimeUnit.MILLISECONDS.sleep(1000);
-		} catch (InterruptedException e) {
-		}
-		
-		tourService.tracker.stopTracker();
-		List<UserReward> userRewards = user.getUserRewards();
-
-		System.out.println("userRewards.size():  " + userRewards.size());
-		System.out.println("userRewards:  " + userRewards.get(0).getRewardPoints());
-		assertTrue(userRewards.size() > 0);
-	}
-// testb Ok  setProximityBuffer(5) au lieu setProximityBuffer(10)  0505
+	// testb Ok setProximityBuffer(5) au lieu setProximityBuffer(10) 0805
 	@Test
 	public void nearAllAttractionsTest() {
 		GpsUtilService gpsUtilService = new GpsUtilService();
@@ -115,11 +90,88 @@ public class TestRewardsService {
 		System.out.println("userRewards.size():  " + userRewards.size());
 		assertTrue(gpsUtilService.getAttractions().size() == userRewards.size());
 	}
-	
-	
-	
-	
-	
+
+	/************************************************************************
+	 ********************* USERLOCATION Emule*****************************
+	 ************************************************************************/
+
+//test Ok reward = 1 040522
+	/*
+	 * @Test public void usersGetRewards() { User user = new User(UUID.randomUUID(),
+	 * "jon", "000", "jon@tourGuide.com"); GpsUtilService gpsUtilService = new
+	 * GpsUtilService(); RewardsService rewardsService = new
+	 * RewardsService(gpsUtilService, new RewardCentral());
+	 * InternalTestHelper.setInternalUserNumber(0); TourService tourService = new
+	 * TourService(gpsUtilService, rewardsService); tourService.addUser(user);
+	 * assertTrue(user.getUserRewards().size() == 0);
+	 * 
+	 * Attraction attraction = gpsUtilService.getAttractions().get(0);
+	 * user.clearVisitedLocations(); user.addToVisitedLocations(new
+	 * VisitedLocation(user.getUserId(), attraction, new Date()));
+	 * rewardsService.calculateRewards(user);
+	 * 
+	 * try { TimeUnit.MILLISECONDS.sleep(1000); } catch (InterruptedException e) { }
+	 * 
+	 * tourService.tracker.stopTracker(); List<UserReward> userRewards =
+	 * user.getUserRewards(); System.out.println("userRewards.size():  " +
+	 * userRewards.size()); assertTrue(userRewards.size() == 1); }
+	 * 
+	 * // OK 20/04 test reward>0
+	 * 
+	 * @Test public void usersGetRewardsTest() { User user = new
+	 * User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com"); GpsUtilService
+	 * gpsUtilService = new GpsUtilService(); RewardsService rewardsService = new
+	 * RewardsService(gpsUtilService, new RewardCentral());
+	 * InternalTestHelper.setInternalUserNumber(0); TourService tourService = new
+	 * TourService(gpsUtilService, rewardsService); tourService.addUser(user);
+	 * assertTrue(user.getUserRewards().size() == 0);
+	 * 
+	 * Attraction attraction = gpsUtilService.getAttractions().get(0);
+	 * user.clearVisitedLocations(); user.addToVisitedLocations(new
+	 * VisitedLocation(user.getUserId(), attraction, new Date()));
+	 * 
+	 * rewardsService.calculateRewards(user);
+	 * 
+	 * try { TimeUnit.MILLISECONDS.sleep(1000); } catch (InterruptedException e) { }
+	 * 
+	 * tourService.tracker.stopTracker(); List<UserReward> userRewards =
+	 * user.getUserRewards();
+	 * 
+	 * System.out.println("userRewards.size():  " + userRewards.size());
+	 * System.out.println("userRewards:  " + userRewards.get(0).getRewardPoints());
+	 * assertTrue(userRewards.size() > 0); }
+	 * 
+	 * 
+	 * // testb Ok setProximityBuffer(5) au lieu setProximityBuffer(10) 0505
+	 * 
+	 * @Test public void nearAllAttractionsTest2() { User user = new
+	 * User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
+	 * 
+	 * GpsUtilService gpsUtilService = new GpsUtilService(); RewardsService
+	 * rewardsService = new RewardsService(gpsUtilService, new RewardCentral());
+	 * rewardsService.setProximityBuffer(5);
+	 * InternalTestHelper.setInternalUserNumber(0); TourService tourService = new
+	 * TourService(gpsUtilService, rewardsService);
+	 * 
+	 * tourService.addUser(user); tourService.trackUserLocations2(user);
+	 * 
+	 * assertTrue(user.getUserRewards().size() == 0);
+	 * 
+	 * user.clearVisitedLocations(); gpsUtilService.getAttractions().forEach(attract
+	 * -> { user.addToVisitedLocations(new VisitedLocation(user.getUserId(),
+	 * attract, new Date()));
+	 * 
+	 * });
+	 * 
+	 * rewardsService.calculateRewards(user);
+	 * 
+	 * try { TimeUnit.MILLISECONDS.sleep(1000); } catch (InterruptedException e) { }
+	 * 
+	 * tourService.tracker.stopTracker(); List<UserReward> userRewards =
+	 * user.getUserRewards(); System.out.println("userRewards.size():  " +
+	 * userRewards.size()); assertTrue(gpsUtilService.getAttractions().size() ==
+	 * userRewards.size()); }
+	 */
 	// ok 240222***********************************************************
 	/*
 	 * @Test public void isWithinAttractionProximity() { GpsUtilService

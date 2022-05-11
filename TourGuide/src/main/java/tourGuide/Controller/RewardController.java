@@ -1,4 +1,4 @@
-package tourGuideController;
+package tourGuide.Controller;
 
 import java.util.List;
 
@@ -25,12 +25,7 @@ public class RewardController {
 	    	return JsonStream.serialize(tourService.getUserRewards(getUser(userName)));
 	    }
 	
-	/*
-	 * @RequestMapping("/getTripDeals") public String getTripDeals(@RequestParam
-	 * String userName) { List<Provider> providers =
-	 * tourService.getTripDeals(getUser(userName)); return
-	 * JsonStream.serialize(providers); }
-	 */
+
 	 
 	 
 	

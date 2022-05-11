@@ -28,18 +28,15 @@ public class GpsUtilService {
 		gpsUtil = new GpsUtil();
 	}
 
-	private ExecutorService executor = Executors.newFixedThreadPool(10000);
+	private ExecutorService executor = Executors.newFixedThreadPool(1000);
 
-	// Recupérations de toutes les attractions (object Attraction)
+	/* Recuperations de toutes les attractions (object Attraction) */
 	public List<Attraction> getAttractions() {
-		/*
-		 * UUID userId = null; VisitedLocation rter=gpsUtil.getUserLocation(userId);
-		 */
-
+		
 		return gpsUtil.getAttractions();
 	}
 
-	// Recupérations de toutes les attractions (object Attraction)
+	/* Recuperations de toutes les attractions (object Attraction) */
 	public List<UserAttraction> getUserAttractions() {
 		/*
 		 * UUID userId = null; VisitedLocation rter=gpsUtil.getUserLocation(userId);
@@ -55,18 +52,72 @@ public class GpsUtilService {
 		return getUserAttractions;
 	}
 
-	public VisitedLocation getUserLocationApi(UUID userId) {
+	
+	  public VisitedLocation getUserLocationApi(UUID userId) {
+	  
+	  return gpsUtil.getUserLocation(userId); }
+	 
 
-		return gpsUtil.getUserLocation(userId);
-	}
-
-	// *************** Test UserLocation****************************
+	/* *************** Test UserLocation *****************************/
 	public UserLocation getUserLocation2(UUID userId) {
 		
 		return getLocation(userId);
 	}
 
-	// test 12:58
+	/* Test get user location */
+		public UserLocation getLocation(UUID userId) {
+
+			UserLocation userLocation = new UserLocation(userId,
+					ThreadLocalRandom.current().nextDouble(-85.05112878D, 85.05112878D),
+					ThreadLocalRandom.current().nextDouble(-180.0D, 180.0D), new Date());
+			return userLocation;
+		}
+
+	/* Test get VisitedLocation */
+				public VisitedLocation getVisitedLocationFromUserLocation2(UUID userId) {
+
+					UserLocation userLocation = new UserLocation(userId,
+							ThreadLocalRandom.current().nextDouble(-85.05112878D, 85.05112878D),
+							ThreadLocalRandom.current().nextDouble(-180.0D, 180.0D), new Date());
+					VisitedLocation visitedLocation= new VisitedLocation(userId, new Location(userLocation.getLatitude(),userLocation.getLongitude()), new Date());
+					return visitedLocation;
+				}
+				
+	/*
+	 * Demande de localisation -> Attente reponse-> ajout de la localisation dans
+	 * l'historique de localisations
+	 */
+				
+				  public void submitLocation(User user, TourService tourService) {
+				  CompletableFuture.supplyAsync(() -> { return
+						  getVisitedLocationFromUserLocation2(user.getUserId()); },
+				  executor).thenAccept(visitedLocation -> {
+				  
+							tourService.finalizeLocation(user, visitedLocation); }); }
+				 
+				
+				
+				
+	/* **************Fin de Test ******************/
+		
+	/*
+	 * Demande de localisation -> Attente reponse-> ajout de la localisation dans
+	 * l'historique de localisations
+	 */
+		
+	/*
+	 * public void submitLocation(User user, TourService tourService) {
+	 * CompletableFuture.supplyAsync(() -> { return
+	 * gpsUtil.getUserLocation(user.getUserId()); },
+	 * executor).thenAccept(visitedLocation -> {
+	 * 
+	 * tourService.finalizeLocation(user, visitedLocation); }); }
+	 * 
+	 */
+		
+		
+		
+	
 	/*
 	 * public void submitLocation2(User user, TourService tourService) throws
 	 * Exception {
@@ -80,31 +131,10 @@ public class GpsUtilService {
 	 * userLocation.getLatitude(), userLocation.getLongitude()),new Date());
 	 * tourService.finalizeLocation(user, visitedLocation); }); }
 	 */
-	// Test get user location
-	public UserLocation getLocation(UUID userId) {
-
-		UserLocation userLocation = new UserLocation(userId,
-				ThreadLocalRandom.current().nextDouble(-85.05112878D, 85.05112878D),
-				ThreadLocalRandom.current().nextDouble(-180.0D, 180.0D), new Date());
-		return userLocation;
-	}
 	
-	// **************Fin de Test *****************
 // ajout service attraction 
 	
-	// Demande de localisation -> Attente réponse-> ajout de la localisation dans
-	// l'historique de localisations
-
 	
-	  public void submitLocation(User user, TourService tourService) throws
-	  Exception {
-	  
-	  CompletableFuture.supplyAsync(() -> { return
-	  gpsUtil.getUserLocation(user.getUserId()); },
-	  executor).thenAccept(visitedLocation -> {
-	  
-	  tourService.finalizeLocation(user, visitedLocation); }); }
-	 
 
 	/*
 	 * public VisitedLocation getUserLocation(UUID userId) {

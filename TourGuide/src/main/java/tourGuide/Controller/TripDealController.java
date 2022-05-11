@@ -1,4 +1,4 @@
-package tourGuideController;
+package tourGuide.Controller;
 
 import java.util.List;
 

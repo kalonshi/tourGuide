@@ -47,22 +47,29 @@ public class RewardsService {
 		public void calculateRewards(User user) {
 			List<Attraction> attractions = gpsUtilService.getAttractions();
 			List<VisitedLocation> visitedLocationList = user.getVisitedLocations().stream().collect(Collectors.toList());
-			int i=0;
+		/* int i=1; */
 		/* int j=0; */
 			for(VisitedLocation visitedLocation : visitedLocationList) {
-				System.out.println("VisitedLocation visitedLocation latitude="+visitedLocation.location.latitude);
-				System.out.println("nb de visited location : "+i);
-				i++;
+			
+			/*
+			 * System.out.println("VisitedLocation visitedLocation latitude="
+			 * +visitedLocation.location.latitude);
+			 * System.out.println("nb de visited location : "+i); i++;
+			 */
+			 
 				for(Attraction attraction : attractions) {
-					System.out.println("attraction.attractionName="+attraction.attractionName);
 				/*
+				 * System.out.println("attraction.attractionName="+attraction.attractionName);
+				 *//*
 				 * System.out.println("attractionId="+attraction.attractionId);
 				 * 
 				 * System.out.println("user.getUserRewards() size ="+user.getUserRewards().size(
 				 * ));
 				 */
-					System.out.println("user.getUserRewards() size ="+user.getUserRewards().size());
-					if(user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attraction.attractionName)).count() == 0) {
+				/*
+				 * System.out.println("user.getUserRewards() size ="+user.getUserRewards().size(
+				 * ));
+				 */if(user.getUserRewards().stream().filter(r -> r.attraction.attractionName.equals(attraction.attractionName)).count() == 0) {
 						calculateDistanceReward(user, visitedLocation, attraction);
 					/*
 					 * System.out.println("nb reward : "+j); j++;
@@ -74,12 +81,15 @@ public class RewardsService {
 		
 		public void calculateDistanceReward(User user, VisitedLocation visitedLocation, Attraction attraction) {
 			Double distance = getDistance(attraction, visitedLocation.location);
-			System.out.println("distance :"+distance+"<= proximityBufferMiles"+ proximityBufferMiles);
-			if(distance <= proximityBufferMiles) {
+		/*
+		 * System.out.println("distance :"+distance+"<= proximityBufferMiles"+
+		 * proximityBufferMiles);
+		 */if(distance <= proximityBufferMiles) {
 				UserReward userReward = new UserReward(visitedLocation, attraction, distance.intValue());
 				submitRewardPoints(userReward, attraction, user);
-				System.out.println("attraction reward: "+attraction.attractionName);
-			}
+			
+			  System.out.println("attraction reward: "+attraction.attractionName);
+			 }
 		}
 		
 		private void submitRewardPoints(UserReward userReward, Attraction attraction, User user) {
@@ -93,19 +103,7 @@ public class RewardsService {
 					user.addUserReward(userReward);
 				});
 		}
-		private int submitRewardPoints2(UserReward userReward, Attraction attraction, User user) {
-			//userReward.setRewardPoints(10);
-			//user.addUserReward(userReward);
-			CompletableFuture.supplyAsync(() -> {
-			    return rewardsCentral.getAttractionRewardPoints(attraction.attractionId, user.getUserId());
-			}, executor)
-				.thenAccept(points -> { 
-					userReward.setRewardPoints(points);
-					user.addUserReward(userReward);
-				});
-			int index=user.getUserRewards().size()-1;
-			return user.getUserRewards().get(index).getRewardPoints();
-		}
+
 		public int getRewardPoints(UserAttraction attraction, User user) {
 			
 			 return rewardsCentral.getAttractionRewardPoints(attraction.getAttractionId(),
@@ -125,7 +123,7 @@ public class RewardsService {
 	        return statuteMiles;
 		}
 		
-	/// ***********************************************************
+	/* ************************************************************/
 	/*
 	 * private static final double STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
 	 * private final Logger logger = LoggerFactory.getLogger(RewardsService.class);
@@ -253,11 +251,10 @@ public class RewardsService {
 	 * 
 	 * } } } }
 	 */
-
-	private int getDistance2(UserAttraction userAttraction, Location location) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	/*
+	 * private int getDistance2(UserAttraction userAttraction, Location location) {
+	 * // TODO Auto-generated method stub return 0; }
+	 */
 
 	/*
 	 * public void calculateDistanceReward(User user, VisitedLocation
@@ -306,11 +303,11 @@ public class RewardsService {
 	 * rewardsCentral.getAttractionRewardPoints(userAttraction.getAttractionId(),
 	 * user.getUserId()); }, executor).thenAccept(points -> {
 	 * userReward.setRewardPoints(points); user.addUserReward(userReward);
-	 * System.out.println(" Comaletable userReward n° :" +
+	 * System.out.println("  userReward n :" +
 	 * userReward.getRewardPoints()); });
 	 */
 	/*
-	 * System.out.println("userReward n° :"+userReward.getRewardPoints());
+	 * System.out.println("userReward n :"+userReward.getRewardPoints());
 	 */
 	/*
 	 * int points=rewardsCentral.getAttractionRewardPoints(userAttraction.

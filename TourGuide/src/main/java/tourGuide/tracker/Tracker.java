@@ -19,7 +19,7 @@ import tourGuide.user.User;
 public class Tracker extends Thread {
 
 	private Logger logger = LoggerFactory.getLogger(Tracker.class);
-	private static final long trackingPollingInterval = TimeUnit.SECONDS.toSeconds(5);
+	private static final long trackingPollingInterval = TimeUnit.MINUTES.toSeconds(5);
 	private final TourService tourService;
 	private final Map<User, Boolean> completedTrackingMap = new HashMap<>();
 	private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -54,10 +54,6 @@ public class Tracker extends Thread {
 			List<User> users = tourService.getAllUsers();
 			logger.debug("Begin Tracker. Tracking " + users.size() + " users.");
 			stopWatch.start();
-			users.forEach(u -> completedTrackingMap.put(u, false));
-			/* users.forEach(u -> tourService.trackUserLocation(u)); */
-
-			
 			users.forEach(u -> tourService.trackUserLocation(u));
 			boolean notFinished = true;
 			while (notFinished) {

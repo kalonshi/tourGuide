@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import gpsUtil.location.Attraction;
 import gpsUtil.location.Location;
 import gpsUtil.location.VisitedLocation;
 import tourGuide.helper.InternalTestHelper;
@@ -47,12 +46,15 @@ public class TourService {
 	private final TripPricer tripPricer = new TripPricer();
 	public final Tracker tracker;
 	ExecutorService executor = Executors.newFixedThreadPool(1000);
-	// Fixed Thread Pool : un pool qui contient un nombre fixe de threads. Ceux-ci
-	// sont utilisés pour exécuter en parallèle les différentes tâches. Si tous les
-	// threads sont occupés alors la tâche est empilée jusqu'à ce qu'elle puisse
-	// être exécutée par un thread
+	/*
+	 * Fixed Thread Pool : un pool qui contient un nombre fixe de threads. Ceux-ci
+	 * sont utilises pour executer en parallèle les differentes taches. Si tous les
+	 * threads sont occupes alors la tache est empilee jusqu'a ce qu'elle puisse
+	 * etre executee par un thread
+	 */
 	boolean testMode = true;
 
+	/* boolean testMode =false; */
 	public TourService(GpsUtilService gpsUtilService, RewardsService rewardsService) {
 		this.gpsUtilService = gpsUtilService;
 		this.rewardsService = rewardsService;
@@ -61,20 +63,21 @@ public class TourService {
 			logger.info("TestMode enabled");
 
 			logger.debug("Initializing users");
+
 			initializeInternalUsers();
 
 			logger.debug("Finished initializing users");
-
+			initializeTripPricer();
 		}
 		tracker = new Tracker(this);
-		initializeTripPricer();
+
 		addShutDownHook();
 	}
 
 	private void addShutDownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
-				System.out.println("Shutdown UserService");
+				System.out.println("Shutdown TourService");
 				tracker.stopTracker();
 			}
 		});
@@ -88,30 +91,55 @@ public class TourService {
 		return user.getUserRewards();
 	}
 
+	public User getUser(String userName) {
+		return internalUserMap.get(userName);
+	}
+
+	public List<User> getAllUsers() {
+		return internalUserMap.values().stream().collect(Collectors.toList());
+	}
+
+	public void addUser(User user) {
+		if (!internalUserMap.containsKey(user.getUserName())) {
+			internalUserMap.put(user.getUserName(), user);
+		}
+	}
+
 //test userLocation Ok 050522
 	public UserLocation trackUserLocations2(User user) {
-		
-		UserLocation userLocation = gpsUtilService.getUserLocation2(user.getUserId());
-		Location location= new Location(userLocation.getLatitude(), userLocation.getLongitude());
-		VisitedLocation visitedLocation=new VisitedLocation(user.getUserId(), location, new Date());
+		UserLocation userLocation = new UserLocation();
+		userLocation = gpsUtilService.getUserLocation2(user.getUserId());
+		Location location = new Location(userLocation.getLatitude(), userLocation.getLongitude());
+		VisitedLocation visitedLocation = new VisitedLocation(user.getUserId(), location, new Date());
 		user.addToVisitedLocations(visitedLocation);
 		rewardsService.calculateRewards(user);
-		return userLocation;
-	}
-	// methode de recupération de la dernier visited Location si elle existe sinon
-	// ajouter la localisation actuelle de l'user: Recupération de
-	// l'object UserLocation
 
-	public UserLocation getUserLocation2(User user) {
-		UserLocation userLocation = (user.getUserLocations().size() > 0)
-				? user.getUserLocations().get(user.getUserLocations().size() - 1)
-				: trackUserLocations2(user);
 		return userLocation;
 	}
 
-	// methode de recupération de la dernier visited Location si elle existe sinon
-	// ajouter la localisation actuelle de l'user: Recupération de
-	// l'object VisitedLocation
+	/* test VisitedLocation */
+	public UserLocation trackUserLocations3(User user) {
+		UserLocation userLocation = new UserLocation();
+		userLocation = gpsUtilService.getUserLocation2(user.getUserId());
+		Location location = new Location(userLocation.getLatitude(), userLocation.getLongitude());
+		VisitedLocation visitedLocation = new VisitedLocation(user.getUserId(), location, new Date());
+		user.addToVisitedLocations(visitedLocation);
+		rewardsService.calculateRewards(user);
+
+		return userLocation;
+	}
+
+	/*********************************************************************/
+
+	/*
+	 * methode de recuperation de la dernier visited Location si elle existe sinon
+	 * ajouter la localisation actuelle de l'user: Recuperation de l'object
+	 * VisitedLocation
+	 */
+
+	public void trackUserLocation(User user) {
+		gpsUtilService.submitLocation(user, this);
+	}
 
 	/*
 	 * public VisitedLocation getUserLocation(User user) { VisitedLocation
@@ -120,17 +148,21 @@ public class TourService {
 	 * visitedLocation; }
 	 */
 	public VisitedLocation getUserLocation(User user) {
+
 		if (user.getVisitedLocations().size() > 0) {
 			VisitedLocation visitedLocation = user.getLastVisitedLocation();
 			return visitedLocation;
+		} else {
+			trackUserLocation(user);
+			VisitedLocation visitedLocation = user.getLastVisitedLocation();
+
+			return visitedLocation;
 		}
-
-		trackUserLocation(user);
-		VisitedLocation visitedLocation = user.getLastVisitedLocation();
-		return visitedLocation;
 	}
-	// Ajout de la localisation dans l'historique de localisation
 
+	/*
+	 * Ajout de la localisation dans l'historique de localisation
+	 */
 	public void finalizeLocation(User user, VisitedLocation visitedLocation) {
 		user.addToVisitedLocations(visitedLocation);
 		System.out.println("liste des localisation=" + user.getVisitedLocations().size());
@@ -139,21 +171,9 @@ public class TourService {
 
 	}
 
-	// Test 02052022Ajout de la localisation dans l'historique de Userlocalisation
+	/* Liste des recentes localisations des users JSON ARRAY */
 
-	/*
-	 * public void finalizeLocation(User user, UserLocation userLocation) {
-	 * user.addToVisitedLocations(new VisitedLocation(userLocation.getUserId(), new
-	 * Location(userLocation.getLatitude(), userLocation.getLongitude()), new
-	 * Date())); System.out.println("liste des localisation=" +
-	 * user.getVisitedLocations().size()); rewardsService.calculateRewards(user);
-	 * tracker.finalizeTrack(user);
-	 * 
-	 * }
-	 */
-	// Liste des recentes localisations des users JSON ARRAY
-
-	public JSONArray getAllCurrentLocations() throws JSONException {
+	public JSONArray getAllCurrentLocations() throws Exception {
 
 		List<User> users = getAllUsers();
 		JSONArray allCurrentLocation = new JSONArray();
@@ -161,9 +181,13 @@ public class TourService {
 
 		for (int i = 0; i < users.size(); i++) {
 			int lastIndex = (users.get(i).getVisitedLocations().size()) - 1;
+
 			object.put("id", users.get(i).getUserId());
+
 			object.put("longitude", users.get(i).getVisitedLocations().get(lastIndex).location.longitude);
+
 			object.put("latitude", users.get(i).getVisitedLocations().get(lastIndex).location.latitude);
+
 			allCurrentLocation.put(object);
 		}
 		return allCurrentLocation;
@@ -217,20 +241,6 @@ public class TourService {
 		return statuteMiles;
 	}
 
-	public User getUser(String userName) {
-		return internalUserMap.get(userName);
-	}
-
-	public List<User> getAllUsers() {
-		return internalUserMap.values().stream().collect(Collectors.toList());
-	}
-
-	public void addUser(User user) {
-		if (!internalUserMap.containsKey(user.getUserName())) {
-			internalUserMap.put(user.getUserName(), user);
-		}
-	}
-
 	public List<Provider> getTripDeals(User user) {
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
 		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(),
@@ -239,55 +249,6 @@ public class TourService {
 		user.setTripDeals(providers);
 		return providers;
 	}
-
-	// Ajout de la localisation actuelle de l'User
-
-	public void trackUserLocation(User user) {
-
-		try {
-			gpsUtilService.submitLocation(user, this);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	// Test UserLocation Ajout de la localisation actuelle de l'User
-
-	/*
-	 * public VisitedLocation trackUserLocation(User user) {
-	 * 
-	 * UserLocation userLocation=gpsUtilService.getLocation(user.getUserId());
-	 * VisitedLocation visitedLocation = new
-	 * VisitedLocation(userLocation.getUserId(), new
-	 * Location(userLocation.getLatitude(), userLocation.getLongitude()), new
-	 * Date());
-	 * 
-	 * user.addToVisitedLocations(visitedLocation);
-	 * rewardsService.calculateRewards(user); return visitedLocation; }
-	 */
-	/*
-	 * public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation)
-	 * { List<Attraction> nearbyAttractions = new ArrayList<>(); for (Attraction
-	 * attraction : gpsUtilService.getAttractions()) { if
-	 * (rewardsService.isWithinAttractionProximity(attraction,
-	 * visitedLocation.location)) { nearbyAttractions.add(attraction); } } return
-	 * nearbyAttractions; }
-	 * 
-	 * public List<UserAttraction> getNearByAttractions2(UserLocation userLocation)
-	 * { List<UserAttraction> nearbyAttractions = new ArrayList<>(); for
-	 * (UserAttraction userAttraction : gpsUtilService.getUserAttractions()) { if
-	 * (rewardsService.isWithinAttractionProximity2(userAttraction, userLocation)) {
-	 * nearbyAttractions.add(userAttraction); } } return nearbyAttractions; } public
-	 * List<UserAttraction> getNearByAttractions3(UserLocation userLocation) {
-	 * List<UserAttraction> nearbyAttractions = new ArrayList<>();
-	 * 
-	 * for (UserAttraction userAttraction : gpsUtilService.getUserAttractions()) {
-	 * if (rewardsService.isWithinAttractionProximity2(userAttraction,
-	 * userLocation)) { nearbyAttractions.add(userAttraction); } } return
-	 * nearbyAttractions; }
-	 */
 
 	/**********************************************************************************
 	 * 
@@ -336,5 +297,76 @@ public class TourService {
 		LocalDateTime localDateTime = LocalDateTime.now().minusDays(new Random().nextInt(30));
 		return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
 	}
+	// methode de recuperation de la dernier visited Location si elle existe sinon
+	// ajouter la localisation actuelle de l'user: Recuperation de
+	// l'object UserLocation
+
+	/*
+	 * public UserLocation getUserLocation2(User user) { UserLocation userLocation =
+	 * (user.getUserLocations().size() > 0) ?
+	 * user.getUserLocations().get(user.getUserLocations().size() - 1) :
+	 * trackUserLocations2(user); return userLocation; }
+	 */
+
+	// Test 02052022Ajout de la localisation dans l'historique de Userlocalisation
+
+	/*
+	 * public void finalizeLocation(User user, UserLocation userLocation) {
+	 * user.addToVisitedLocations(new VisitedLocation(userLocation.getUserId(), new
+	 * Location(userLocation.getLatitude(), userLocation.getLongitude()), new
+	 * Date())); System.out.println("liste des localisation=" +
+	 * user.getVisitedLocations().size()); rewardsService.calculateRewards(user);
+	 * tracker.finalizeTrack(user);
+	 * 
+	 * }
+	 */
+	// Ajout de la localisation actuelle de l'User
+
+	/*
+	 * public void trackUserLocation(User user) {
+	 * 
+	 * 
+	 * try { gpsUtilService.submitLocation(user, this); } catch (Exception e) { //
+	 * TODO Auto-generated catch block e.printStackTrace(); }
+	 * 
+	 * 
+	 * }
+	 */
+
+	// Test UserLocation Ajout de la localisation actuelle de l'User
+
+	/*
+	 * public VisitedLocation trackUserLocation(User user) {
+	 * 
+	 * UserLocation userLocation=gpsUtilService.getLocation(user.getUserId());
+	 * VisitedLocation visitedLocation = new
+	 * VisitedLocation(userLocation.getUserId(), new
+	 * Location(userLocation.getLatitude(), userLocation.getLongitude()), new
+	 * Date());
+	 * 
+	 * user.addToVisitedLocations(visitedLocation);
+	 * rewardsService.calculateRewards(user); return visitedLocation; }
+	 */
+	/*
+	 * public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation)
+	 * { List<Attraction> nearbyAttractions = new ArrayList<>(); for (Attraction
+	 * attraction : gpsUtilService.getAttractions()) { if
+	 * (rewardsService.isWithinAttractionProximity(attraction,
+	 * visitedLocation.location)) { nearbyAttractions.add(attraction); } } return
+	 * nearbyAttractions; }
+	 * 
+	 * public List<UserAttraction> getNearByAttractions2(UserLocation userLocation)
+	 * { List<UserAttraction> nearbyAttractions = new ArrayList<>(); for
+	 * (UserAttraction userAttraction : gpsUtilService.getUserAttractions()) { if
+	 * (rewardsService.isWithinAttractionProximity2(userAttraction, userLocation)) {
+	 * nearbyAttractions.add(userAttraction); } } return nearbyAttractions; } public
+	 * List<UserAttraction> getNearByAttractions3(UserLocation userLocation) {
+	 * List<UserAttraction> nearbyAttractions = new ArrayList<>();
+	 * 
+	 * for (UserAttraction userAttraction : gpsUtilService.getUserAttractions()) {
+	 * if (rewardsService.isWithinAttractionProximity2(userAttraction,
+	 * userLocation)) { nearbyAttractions.add(userAttraction); } } return
+	 * nearbyAttractions; }
+	 */
 
 }

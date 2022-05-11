@@ -1,6 +1,6 @@
 package tourGuide.user;
 
-import java.util.concurrent.ThreadLocalRandom;
+
 
 import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;

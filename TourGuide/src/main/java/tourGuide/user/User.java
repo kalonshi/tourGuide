@@ -79,7 +79,9 @@ public class User {
 	}
 
 	public void clearVisitedLocations() {
+		userLocationListLock.lock();
 		visitedLocations.clear();
+		userLocationListLock.unlock();
 	}
 
 	/*
@@ -87,26 +89,21 @@ public class User {
 	 * visitedLocations.clear(); userLocationListLock.unlock(); }
 	 */
 
-	public List<UserLocation> getUserLocations() {
-		userLocationListLock.lock();
-		try {
-			return userLocations;
-		} finally {
-			userLocationListLock.unlock();
-		}
-	}
+	/*
+	 * public List<UserLocation> getUserLocations() { userLocationListLock.lock();
+	 * try { return userLocations; } finally { userLocationListLock.unlock(); } }
+	 */
 
-	public void addToUserLocations(UserLocation userLocation) {
-		userLocationListLock.lock();
-		userLocations.add(userLocation);
-		userLocationListLock.unlock();
-	}
+	/*
+	 * public void addToUserLocations(UserLocation userLocation) {
+	 * userLocationListLock.lock(); userLocations.add(userLocation);
+	 * userLocationListLock.unlock(); }
+	 */
 
-	public void clearUserLocations() {
-		userLocationListLock.lock();
-		userLocations.clear();
-		userLocationListLock.unlock();
-	}
+	/*
+	 * public void clearUserLocations() { userLocationListLock.lock();
+	 * userLocations.clear(); userLocationListLock.unlock(); }
+	 */
 
 	public VisitedLocation getLastVisitedLocation() {
 		return visitedLocations.get(visitedLocations.size() - 1);
@@ -115,14 +112,7 @@ public UserLocation lastLocation() {
 		
 		return userLocations.get(userLocations.size()-1);
 	}
-	/*
-	 * public void addUserReward(UserReward userReward) {
-	 * if(userRewards.stream().filter(r ->
-	 * !r.attraction.attractionName.equals(userReward.attraction)).count() == 0) {
-	 * userRewards.add(userReward); }
-	 * 
-	 * }
-	 */
+	
 	public synchronized void addUserReward(UserReward userReward) {
 		userRewards.add(userReward);
 	}
@@ -139,11 +129,7 @@ public UserLocation lastLocation() {
 		this.userPreferences = userPreferences;
 	}
 
-	/*
-	 * public VisitedLocation getLastVisitedLocation() { return
-	 * visitedLocations.get(visitedLocations.size() - 1); }
-	 */
-
+	
 	public void setTripDeals(List<Provider> tripDeals) {
 		this.tripDeals = tripDeals;
 	}
